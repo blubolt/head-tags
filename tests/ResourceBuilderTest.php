@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace blubolt\HeadTags\Tests;
 
 use blubolt\HeadTags\BuilderInterface;
-use blubolt\HeadTags\OpenGraphBuilder;
+use blubolt\HeadTags\ResourceBuilder;
 use Generator;
 
 /**
- * Class OpenGraphBuilderTest
+ * Class ResourceBuilderTest
  */
-class OpenGraphBuilderTest extends TestCase
+class ResourceBuilderTest extends TestCase
 {
 	/** @var BuilderInterface */
 	protected $builder;
 
 	public function setUp(): void
 	{
-		$this->builder = new OpenGraphBuilder();
+		$this->builder = new ResourceBuilder();
 	}
 
 	public function tearDown(): void
@@ -46,13 +46,14 @@ class OpenGraphBuilderTest extends TestCase
 
 		yield [
 			[
-				['og:type', 'website'],
-				['title', 'stub title'],
-				['description', 'stub description'],
-				['image', 'stub image 1', ['alt' => 'stub image 1 alt']],
-				['image', 'stub image 2'],
+				['dns-prefetch', 'stub dns-prefetch'],
+				['preconnect', 'stub preconnect'],
+				['prefetch', 'stub prefetch'],
+				['stylesheet', 'stub stylesheet'],
+				['script', 'stub script'],
+				['script', 'stub script', ['async' => null, 'defer' => null]],
 			],
-			__DIR__ . '/assets/OpenGraphBuilder1.html',
+			__DIR__ . '/assets/ResourceBuilder1.html',
 		];
 	}
 }

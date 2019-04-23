@@ -1,53 +1,56 @@
-<?php namespace Utlime\SeoMetaTags;
+<?php
 
-use PHPUnit\Framework\TestCase;
+declare(strict_types=1);
+
+namespace blubolt\HeadTags\Tests;
+
+use blubolt\HeadTags\BuilderInterface;
+use blubolt\HeadTags\TwitterBuilder;
+use Generator;
 
 /**
  * Class TwitterBuilderTest
- * @package Utlime\SeoMetaTags
  */
 class TwitterBuilderTest extends TestCase
 {
-	/**
-	 * @var BuilderInterface
-	 */
+	/** @var BuilderInterface */
 	protected $builder;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->builder = new TwitterBuilder();
 	}
 
-	public function tearDown()
+	public function tearDown(): void
 	{
-		$this->builder = null;
+		unset($this->builder);
 	}
 
 	/**
 	 * @dataProvider dataBuildSet
-	 * @param array  $set
-	 * @param string $result
+	 * @param mixed[] $set
+	 * @param string  $result
 	 */
-	public function testBuild(array $set, $result)
+	public function testBuild(array $set, string $result): void
 	{
-		foreach ($set as $name => $value) {
-			$this->builder->add($name, $value);
+		foreach ($set as $args) {
+			call_user_func_array([$this->builder, 'add'], $args);
 		}
 
-		$this->assertXmlStringEqualsXmlFile($result, '<head>' . $this->builder->build() . '</head>');
+		$this->assertHtmlStringEqualsHtmlFile($result, '<head>' . $this->builder->build() . '</head>');
 	}
 
-	public function dataBuildSet()
+	public function dataBuildSet(): Generator
 	{
-		yield [[], __DIR__ . '/assets/EmptyBuilder0.xml'];
+		yield [[], __DIR__ . '/assets/EmptyBuilder0.html'];
 
 		yield [
 			[
-				'twitter:card' => 'summary',
-				'title'		=> 'stub title',
-				'description'  => 'stub description',
+				['twitter:card', 'summary'],
+				['title', 'stub title'],
+				['description', 'stub description'],
 			],
-			__DIR__ . '/assets/TwitterBuilder1.xml',
+			__DIR__ . '/assets/TwitterBuilder1.html',
 		];
 	}
 }

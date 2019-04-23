@@ -1,8 +1,11 @@
-<?php namespace Utlime\SeoMetaTags;
+<?php
+
+declare(strict_types=1);
+
+namespace blubolt\HeadTags;
 
 /**
  * Class BuilderDelegate
- * @package Utlime\SeoMetaTags
  */
 class BuilderDelegate implements BuilderInterface
 {
@@ -11,7 +14,6 @@ class BuilderDelegate implements BuilderInterface
 
 	/**
 	 * BuilderDelegate constructor.
-	 * @param BuilderInterface[] $builders
 	 */
 	public function __construct(BuilderInterface ...$builders)
 	{
@@ -21,10 +23,10 @@ class BuilderDelegate implements BuilderInterface
 	/**
 	 * @inheritdoc
 	 */
-	public function add($name, $value)
+	public function add(string $name, string $value, array $attributes = []): BuilderInterface
 	{
 		foreach ($this->builders as $builder) {
-			$builder->add($name, $value);
+			$builder->add($name, $value, $attributes);
 		}
 
 		return $this;
@@ -33,7 +35,7 @@ class BuilderDelegate implements BuilderInterface
 	/**
 	 * @inheritdoc
 	 */
-	public function build()
+	public function build(): string
 	{
 		$build = '';
 

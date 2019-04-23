@@ -1,19 +1,25 @@
-<?php namespace Utlime\SeoMetaTags;
+<?php
 
-use PHPUnit\Framework\TestCase;
+declare(strict_types=1);
+
+namespace blubolt\HeadTags\Tests;
+
+use blubolt\HeadTags\BuilderDelegate;
+use blubolt\HeadTags\BuilderInterface;
+use blubolt\HeadTags\CommonBuilder;
+use blubolt\HeadTags\OpenGraphBuilder;
+use blubolt\HeadTags\TwitterBuilder;
+use Generator;
 
 /**
  * Class BuilderDelegateTest
- * @package Utlime\SeoMetaTags
  */
 class BuilderDelegateTest extends TestCase
 {
-	/**
-	 * @var BuilderInterface
-	 */
+	/** @var BuilderInterface */
 	protected $builder;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->builder = new BuilderDelegate(
 			new CommonBuilder(),
@@ -22,39 +28,40 @@ class BuilderDelegateTest extends TestCase
 		);
 	}
 
-	public function tearDown()
+	public function tearDown(): void
 	{
-		$this->builder = null;
+		unset($this->builder);
 	}
 
 	/**
 	 * @dataProvider dataBuildSet
-	 * @param array  $set
-	 * @param string $result
+	 * @param mixed[] $set
+	 * @param string  $result
 	 */
-	public function testBuild(array $set, $result)
+	public function testBuild(array $set, string $result): void
 	{
-		foreach ($set as $name => $value) {
-			$this->builder->add($name, $value);
+		foreach ($set as $args) {
+			call_user_func_array([$this->builder, 'add'], $args);
 		}
 
-		$this->assertXmlStringEqualsXmlFile($result, '<head>' . $this->builder->build() . '</head>');
+		$this->assertHtmlStringEqualsHtmlFile($result, '<head>' . $this->builder->build() . '</head>');
 	}
 
-	public function dataBuildSet()
+	public function dataBuildSet(): Generator
 	{
-		yield [[], __DIR__ . '/assets/EmptyBuilder0.xml'];
+		yield [[], __DIR__ . '/assets/EmptyBuilder0.html'];
 
 		yield [
 			[
-				'title'		=> 'stub title',
-				'description'  => 'stub description',
-				'language'	 => 'stub language',
-				'canonical'	=> 'stub canonical',
-				'image'		=> 'stub image',
-				'og:image'	 => 'stub og:image',
+				['title', 'stub title default'],
+				['title', 'stub title'],
+				['description', 'stub description'],
+				['language', 'stub language'],
+				['canonical', 'stub canonical'],
+				['image', 'stub image'],
+				['og:image', 'stub og:image'],
 			],
-			__DIR__ . '/assets/BuilderDelegate1.xml',
+			__DIR__ . '/assets/BuilderDelegate1.html',
 		];
 	}
 }

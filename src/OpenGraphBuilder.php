@@ -1,8 +1,12 @@
-<?php namespace Utlime\SeoMetaTags;
+<?php
+
+declare(strict_types=1);
+
+namespace blubolt\HeadTags;
 
 /**
- * Class OpenGraphAbstractBuilder
- * @package Utlime\SeoMetaTags
+ * Class OpenGraphBuilder
+ *
  * @link http://ogp.me/ - specification
  */
 class OpenGraphBuilder extends AbstractBuilder
@@ -10,39 +14,28 @@ class OpenGraphBuilder extends AbstractBuilder
 	/**
 	 * @inheritdoc
 	 */
-	protected function init()
+	protected function init(): void
 	{
 		$this
-			->addRule('og:title', [$this, 'ruleCommon'])
+			->addRule('og:title', [$this, 'ruleCommon'], true)
 			->addAlias('title', 'og:title')
-			->addRule('og:description', [$this, 'ruleCommon'])
+			->addRule('og:description', [$this, 'ruleCommon'], true)
 			->addAlias('description', 'og:description')
-			->addRule('og:type', [$this, 'ruleCommon'])
-			->addRule('og:url', [$this, 'ruleCommon'])
+			->addRule('og:type', [$this, 'ruleCommon'], true)
+			->addRule('og:url', [$this, 'ruleCommon'], true)
 			->addAlias('canonical', 'og:url')
-			->addRule('og:determiner', [$this, 'ruleCommon'])
-			->addRule('og:locale', [$this, 'ruleCommon'])
+			->addRule('og:determiner', [$this, 'ruleCommon'], true)
+			->addRule('og:locale', [$this, 'ruleCommon'], true)
 			->addAlias('language', 'og:locale')
-			->addRule('og:locale:alternate', [$this, 'ruleCommon'])
-			->addRule('og:site_name', [$this, 'ruleCommon'])
-			->addRule('og:image', [$this, 'ruleCommon'])
-			->addAlias('og:image:url', 'og:image')
+			->addRule('og:locale:alternate', [$this, 'ruleCommon'], true)
+			->addRule('og:site_name', [$this, 'ruleCommon'], true)
+			->addRule('og:image', [$this, 'ruleImage'])
 			->addAlias('image', 'og:image')
-			->addRule('og:image:secure_url', [$this, 'ruleCommon'])
-			->addRule('og:image:type', [$this, 'ruleCommon'])
-			->addRule('og:image:width', [$this, 'ruleCommon'])
-			->addRule('og:image:height', [$this, 'ruleCommon'])
-			->addRule('og:audio', [$this, 'ruleCommon'])
-			->addRule('og:audio:secure_url', [$this, 'ruleCommon'])
-			->addRule('og:audio:type', [$this, 'ruleCommon'])
-			->addRule('og:video', [$this, 'ruleCommon'])
-			->addRule('og:video:secure_url', [$this, 'ruleCommon'])
-			->addRule('og:video:type', [$this, 'ruleCommon'])
-			->addRule('og:video:width', [$this, 'ruleCommon'])
-			->addRule('og:video:height', [$this, 'ruleCommon'])
-			->addRule('article:published_time', [$this, 'ruleCommon'])
-			->addRule('article:modified_time', [$this, 'ruleCommon'])
-			->addRule('article:expiration_time', [$this, 'ruleCommon'])
+			->addRule('og:audio', [$this, 'ruleAudio'])
+			->addRule('og:video', [$this, 'ruleVideo'])
+			->addRule('article:published_time', [$this, 'ruleCommon'], true)
+			->addRule('article:modified_time', [$this, 'ruleCommon'], true)
+			->addRule('article:expiration_time', [$this, 'ruleCommon'], true)
 			->addRule('article:author', [$this, 'ruleCommon'])
 			->addRule('article:section', [$this, 'ruleCommon'])
 			->addRule('article:tag', [$this, 'ruleCommon'])
@@ -75,14 +68,63 @@ class OpenGraphBuilder extends AbstractBuilder
 	}
 
 	/**
-	 * @param string $content
-	 * @param string $name
+	 * @param string   $content
+	 * @param string   $name
+	 * @param string[] $properties
 	 */
-	protected function ruleCommon($content, $name)
+	protected function ruleImage(string $content, string $name, array $properties = []): void
 	{
-		$meta = $this->getMeta()->addChild('meta');
+		$this->ruleStructured($content, 'og:image', $properties, ['secure_url', 'type', 'width', 'height', 'alt']);
+	}
 
-		$meta->addAttribute('property', $name);
-		$meta->addAttribute('content', $content);
+	/**
+	 * @param string   $content
+	 * @param string   $name
+	 * @param string[] $properties
+	 */
+	protected function ruleVideo(string $content, string $name, array $properties = []): void
+	{
+		$this->ruleStructured($content, 'og:video', $properties, ['secure_url', 'type', 'width', 'height']);
+	}
+
+	/**
+	 * @param string   $content
+	 * @param string   $name
+	 * @param string[] $properties
+	 */
+	protected function ruleAudio(string $content, string $name, array $properties = []): void
+	{
+		$this->ruleStructured($content, 'og:audio', $properties, ['secure_url', 'type']);
+	}
+
+	/**
+	 * @param string   $content
+	 * @param string   $name
+	 * @param string[] $properties
+	 * @param string[] $allowedProperties
+	 */
+	protected function ruleStructured(
+		string $content,
+		string $name,
+		array $properties = [],
+		array $allowedProperties = []
+	): void {
+		$this->ruleCommon($content, $name);
+
+		foreach ($properties as $property => $value) {
+			if (!in_array($property, $allowedProperties, true)) {
+				continue;
+			}
+
+			$this->ruleCommon($value, $name . ':' . $property);
+		}
+	}
+
+	protected function ruleCommon(string $content, string $name): void
+	{
+		$el = $this->createElement('meta');
+
+		$el->setAttribute('property', $name);
+		$el->setAttribute('content', $content);
 	}
 }

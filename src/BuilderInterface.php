@@ -1,22 +1,28 @@
-<?php namespace Utlime\SeoMetaTags;
+<?php
+
+declare(strict_types=1);
+
+namespace blubolt\HeadTags;
 
 /**
  * Interface BuilderInterface
- * @package Utlime\SeoMetaTags
  */
 interface BuilderInterface
 {
 	/**
 	 * Add property to builder
-	 * @param string $name
-	 * @param string $value
-	 * @return $this
+	 *
+	 * @param string   $name
+	 * @param string   $value
+	 * @param string[] $attributes
+	 * @return static
 	 */
-	public function add($name, $value);
+	public function add(string $name, string $value, array $attributes = []): BuilderInterface;
 
 	/**
 	 * Build content which based on properties
+	 *
 	 * @return string
 	 */
-	public function build();
+	public function build(): string;
 }

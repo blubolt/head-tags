@@ -1,32 +1,37 @@
-<?php namespace Utlime\SeoMetaTags;
+<?php
+
+declare(strict_types=1);
+
+namespace blubolt\HeadTags;
+
+use DOMAttr;
+use DOMDocument;
+use DOMElement;
 
 /**
  * Class AbstractBuilder
- * @package Utlime\SeoMetaTags
  */
 abstract class AbstractBuilder implements BuilderInterface
 {
-	/**
-	 * @var \SimpleXMLElement
-	 */
-	private $meta;
+	/** @var DOMDocument */
+	protected $document;
 
-	/**
-	 * @var array
-	 */
+	/** @var mixed[] */
+	private $values = [];
+
+	/** @var mixed[] */
 	private $rules = [];
 
-	/**
-	 * @var array
-	 */
+	/** @var string[] */
 	private $aliases = [];
 
 	/**
 	 * AbstractBuilder constructor.
 	 */
-	public final function __construct()
+	final public function __construct()
 	{
-		$this->meta = new \SimpleXMLIterator('<meta/>');
+		$this->document = new DOMDocument();
+		$this->document->formatOutput = true;
 
 		$this->init();
 	}
@@ -34,15 +39,23 @@ abstract class AbstractBuilder implements BuilderInterface
 	/**
 	 * @inheritdoc
 	 */
-	public final function add($name, $value)
+	final public function add(string $name, string $value, array $attributes = []): BuilderInterface
 	{
 		if (array_key_exists($name, $this->aliases)) {
 			$name = $this->aliases[$name];
 		}
 
-		if (array_key_exists($name, $this->rules)) {
-			call_user_func($this->rules[$name], $value, $name);
+		if (!array_key_exists($name, $this->rules)) {
+			return $this;
 		}
+
+		[, $unique] = $this->rules[$name];
+
+		if ($unique) {
+			$this->values[$name] = [];
+		}
+
+		$this->values[$name][] = [$value, $attributes];
 
 		return $this;
 	}
@@ -50,23 +63,24 @@ abstract class AbstractBuilder implements BuilderInterface
 	/**
 	 * @inheritdoc
 	 */
-	public final function build()
+	final public function build(): string
 	{
-		$build = '';
-
-		for($this->meta->rewind(); $this->meta->valid(); $this->meta->next() ) {
-			$build .= $this->meta->current()->asXML();
+		foreach ($this->values as $name => $entries) {
+			foreach ($entries as [$value, $attributes]) {
+				[$callable] = $this->rules[$name];
+				call_user_func($callable, $value, $name, $attributes);
+			}
 		}
 
-		return $build;
+		return trim((string)$this->document->saveHTML());
 	}
 
 	/**
 	 * @param string $alias
 	 * @param string $name
-	 * @return $this
+	 * @return static
 	 */
-	protected final function addAlias($alias, $name)
+	final protected function addAlias(string $alias, string $name): BuilderInterface
 	{
 		$this->aliases[$alias] = $name;
 
@@ -76,28 +90,54 @@ abstract class AbstractBuilder implements BuilderInterface
 	/**
 	 * @param string   $name
 	 * @param callable $callable
-	 * @return $this
+	 * @param bool     $unique
+	 * @return static
 	 */
-	protected final function addRule($name, callable $callable)
+	final protected function addRule(string $name, callable $callable, bool $unique = false): BuilderInterface
 	{
-		$this->rules[$name] = $callable;
+		$this->rules[$name] = [$callable, $unique];
 
 		return $this;
 	}
 
 	/**
-	 * @return \SimpleXMLElement
+	 * Create an element in the built document
+	 *
+	 * @param string      $name
+	 * @param string|null $value
+	 * @return DOMElement
 	 */
-	protected final function getMeta()
+	final protected function createElement(string $name, ?string $value = null): DOMElement
 	{
-		return $this->meta;
+		$el = $this->document->createElement($name, $value ?: '');
+		$this->document->appendChild($el);
+
+		return $el;
+	}
+
+	/**
+	 * Create an attribute ready to add to an element
+	 *
+	 * @param string      $name
+	 * @param string|null $value
+	 * @return DOMAttr
+	 */
+	final protected function createAttribute(string $name, ?string $value = null): DOMAttr
+	{
+		$attr = $this->document->createAttribute($name);
+
+		// Allow minimization of attribute if value not set
+		if ($value) {
+			$attr->value = $value;
+		}
+
+		return $attr;
 	}
 
 	/**
 	 * Init rules and aliases
 	 */
-	protected function init()
+	protected function init(): void
 	{
-
 	}
 }

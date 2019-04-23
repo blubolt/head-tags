@@ -1,101 +1,86 @@
-<?php namespace Utlime\SeoMetaTags;
+<?php
+
+declare(strict_types=1);
+
+namespace blubolt\HeadTags;
 
 /**
- * Class SearchAbstractBuilder
- * @package Utlime\SeoMetaTags
+ * Class CommonBuilder
  */
 class CommonBuilder extends AbstractBuilder
 {
 	/**
 	 * @inheritdoc
 	 */
-	protected function init()
+	protected function init(): void
 	{
 		$this
-			->addRule('title', [$this, 'ruleTitle'])
-			->addRule('description', [$this, 'ruleCommon'])
-			->addRule('robots', [$this, 'ruleCommon'])
-			->addRule('canonical', [$this, 'ruleLink'])
-			->addRule('prev', [$this, 'ruleLink'])
-			->addRule('next', [$this, 'ruleLink'])
+			->addRule('title', [$this, 'ruleTitle'], true)
+			->addRule('description', [$this, 'ruleCommon'], true)
+			->addRule('robots', [$this, 'ruleCommon'], true)
+			->addRule('canonical', [$this, 'ruleLink'], true)
+			->addRule('prev', [$this, 'ruleLink'], true)
+			->addRule('next', [$this, 'ruleLink'], true)
 			->addRule('alternate', [$this, 'ruleLink'])
-			->addRule('rss', [$this, 'ruleRSS'])
-			->addRule('viewport', [$this, 'ruleCommon'])
-			->addRule('content-language', [$this, 'ruleHTTPEquiv'])
+			->addRule('rss', [$this, 'ruleRss'])
+			->addRule('viewport', [$this, 'ruleCommon'], true)
+			->addRule('content-language', [$this, 'ruleHTTPEquiv'], true)
 			->addAlias('language', 'content-language')
 			->addRule('content-type', [$this, 'ruleHTTPEquiv'])
-			->addRule('charset', [$this, 'ruleCharset'])
-			->addRule('keywords', [$this, 'ruleCommon'])
-			->addRule('geo.position', [$this, 'ruleCommon'])
-			->addRule('geo.placename', [$this, 'ruleCommon'])
-			->addRule('geo.region', [$this, 'ruleCommon']);
+			->addRule('charset', [$this, 'ruleCharset'], true)
+			->addRule('keywords', [$this, 'ruleCommon'], true)
+			->addRule('geo.position', [$this, 'ruleCommon'], true)
+			->addRule('geo.placename', [$this, 'ruleCommon'], true)
+			->addRule('geo.region', [$this, 'ruleCommon'], true);
+	}
+
+	protected function ruleTitle(string $value): void
+	{
+		$this->createElement('title', $value);
+	}
+
+	protected function ruleCommon(string $content, string $name): void
+	{
+		$el = $this->createElement('meta');
+
+		$el->setAttribute('name', $name);
+		$el->setAttribute('content', $content);
+	}
+
+	protected function ruleCharset(string $charset): void
+	{
+		$el = $this->createElement('meta');
+
+		$el->setAttribute('charset', $charset);
+	}
+
+	protected function ruleHTTPEquiv(string $content, string $httpEquiv): void
+	{
+		$el = $this->createElement('meta');
+
+		$el->setAttribute('http-equiv', $httpEquiv);
+		$el->setAttribute('content', $content);
 	}
 
 	/**
-	 * @param string $value
+	 * @param string   $href
+	 * @param string   $rel
+	 * @param string[] $attributes
 	 */
-	protected function ruleTitle($value)
+	protected function ruleLink(string $href, string $rel, array $attributes = []): void
 	{
-		$this->getMeta()
-			->addChild('title', $value);
-	}
+		$el = $this->createElement('link');
 
-	/**
-	 * @param string $content
-	 * @param string $name
-	 */
-	protected function ruleCommon($content, $name)
-	{
-		$meta = $this->getMeta()->addChild('meta');
+		$el->setAttribute('rel', $rel);
+		$el->setAttribute('href', $href);
 
-		$meta->addAttribute('name', $name);
-		$meta->addAttribute('content', $content);
-	}
-
-	/**
-	 * @param string $charset
-	 */
-	protected function ruleCharset($charset)
-	{
-		$this->getMeta()
-			->addChild('meta')
-			->addAttribute('charset', $charset);
-	}
-
-	/**
-	 * @param string $content
-	 */
-	protected function ruleHTTPEquiv($content, $http_equiv)
-	{
-		$meta = $this->getMeta()->addChild('meta');
-
-		$meta->addAttribute('http-equiv', $http_equiv);
-		$meta->addAttribute('content', $content);
-	}
-
-	/**
-	 * @param string	  $href
-	 * @param string	  $rel
-	 * @param null|string $type
-	 */
-	protected function ruleLink($href, $rel, $type = null)
-	{
-		$meta = $this->getMeta()->addChild('link');
-
-		$meta->addAttribute('rel', $rel);
-		$meta->addAttribute('href', $href);
-
-		if ($type !== null) {
-			$meta->addAttribute('type', $type);
+		foreach ($attributes as $name => $value) {
+			$el->appendChild($this->createAttribute($name, $value));
 		}
 	}
 
-	/**
-	 * @param string $href
-	 * @param string $rel
-	 */
-	protected function ruleRSS($href, $rel)
+	protected function ruleRss(string $href, string $rel): void
 	{
-		$this->ruleLink($href, $rel, 'application/rss+xml');
+		$this->ruleLink($href, $rel, ['type' => 'application/rss+xml']);
 	}
 }

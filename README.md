@@ -1,17 +1,28 @@
-# utlime/seo-meta-tags
-Library for building seo tags
+# blubolt/head-tags
+Library for building head tags with a focus on SEO.
 
-Supported social meta tags, such Open Graph Tags, Facebook, Twitter, LinkedIn, Google+, Pinterest and etc
+A number of tag builders are provided:
+* **CommonBuilder**  
+  Common SEO tags (see https://moz.com/blog/seo-meta-tags for a primer)
 
-## Specifications and helpful links
-http://ogp.me/
-https://dev.twitter.com/cards/markup
-https://moz.com/blog/seo-meta-tags
+* **OpenGraphBuilder**  
+  [OpenGraph](http://ogp.me) used by the likes of Facebook, LinkedIn and Pinterest
+  
+* **TwitterBuilder**  
+  [Twitter cards](https://dev.twitter.com/cards/markup)
+
+* **ResourceBuilder**  
+  [Resource hints](https://www.w3.org/TR/resource-hints), stylesheet and script tags
+  
+* **FacebookBuilder**  
+  Facebook insights/scraper authorization
+
+You can check the builder sources for a full list of all supported tags.
 
 ## Installation
 You can install directly via Composer:
 ```bash
-$ composer require "utlime/seo-meta-tags":"^1.0"
+$ composer require "blubolt/head-tags":"^2.0"
 ```
 
 ## Basic usage
@@ -22,7 +33,7 @@ $builder = new BuilderDelegate(
    new OpenGraphBuilder()
 );
 
-$header_chunk = $builder
+$headerChunk = $builder
     ->add('title', 'your title')
     ->add('description', 'your description')
     ->add('language', 'your language')
@@ -30,7 +41,7 @@ $header_chunk = $builder
     ->add('image', 'your image url')
     ->build();
 ```
-As result you will have the follow
+As result you will have the following:
 ```html
 <title>your title</title>
 <meta name="description" content="your description"/>
@@ -46,34 +57,5 @@ As result you will have the follow
 ```
 
 ## Extending
-For extending or modifying you just need to implement interface
-```php
-<?php namespace Utlime\SeoMetaTags;
-
-/**
- * Interface BuilderInterface
- * @package Utlime\SeoMetaTags
- */
-interface BuilderInterface
-{
-    /**
-     * Add property to builder
-     * @param string $name
-     * @param string $value
-     * @return $this
-     */
-    public function add($name, $value);
-
-    /**
-     * Build content which based on properties
-     * @return string
-     */
-    public function build();
-}
-```
-
-## Supported tags
-you can check all supported tags in classes:
-- \Utlime\SeoMetaTags\CommonBuilder
-- \Utlime\SeoMetaTags\OpenGraphBuilder
-- \Utlime\SeoMetaTags\TwitterBuilder
+To add another builder you must implement `BuilderInterface`, more often than not by simply
+extending `AbstractBuilder`.
