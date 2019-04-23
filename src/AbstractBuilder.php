@@ -6,98 +6,98 @@
  */
 abstract class AbstractBuilder implements BuilderInterface
 {
-    /**
-     * @var \SimpleXMLElement
-     */
-    private $meta;
+	/**
+	 * @var \SimpleXMLElement
+	 */
+	private $meta;
 
-    /**
-     * @var array
-     */
-    private $rules = [];
+	/**
+	 * @var array
+	 */
+	private $rules = [];
 
-    /**
-     * @var array
-     */
-    private $aliases = [];
+	/**
+	 * @var array
+	 */
+	private $aliases = [];
 
-    /**
-     * AbstractBuilder constructor.
-     */
-    public final function __construct()
-    {
-        $this->meta = new \SimpleXMLIterator('<meta/>');
+	/**
+	 * AbstractBuilder constructor.
+	 */
+	public final function __construct()
+	{
+		$this->meta = new \SimpleXMLIterator('<meta/>');
 
-        $this->init();
-    }
+		$this->init();
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public final function add($name, $value)
-    {
-        if (array_key_exists($name, $this->aliases)) {
-            $name = $this->aliases[$name];
-        }
+	/**
+	 * @inheritdoc
+	 */
+	public final function add($name, $value)
+	{
+		if (array_key_exists($name, $this->aliases)) {
+			$name = $this->aliases[$name];
+		}
 
-        if (array_key_exists($name, $this->rules)) {
-            call_user_func($this->rules[$name], $value, $name);
-        }
+		if (array_key_exists($name, $this->rules)) {
+			call_user_func($this->rules[$name], $value, $name);
+		}
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public final function build()
-    {
-        $build = '';
+	/**
+	 * @inheritdoc
+	 */
+	public final function build()
+	{
+		$build = '';
 
-        for($this->meta->rewind(); $this->meta->valid(); $this->meta->next() ) {
-            $build .= $this->meta->current()->asXML();
-        }
+		for($this->meta->rewind(); $this->meta->valid(); $this->meta->next() ) {
+			$build .= $this->meta->current()->asXML();
+		}
 
-        return $build;
-    }
+		return $build;
+	}
 
-    /**
-     * @param string $alias
-     * @param string $name
-     * @return $this
-     */
-    protected final function addAlias($alias, $name)
-    {
-        $this->aliases[$alias] = $name;
+	/**
+	 * @param string $alias
+	 * @param string $name
+	 * @return $this
+	 */
+	protected final function addAlias($alias, $name)
+	{
+		$this->aliases[$alias] = $name;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * @param string   $name
-     * @param callable $callable
-     * @return $this
-     */
-    protected final function addRule($name, callable $callable)
-    {
-        $this->rules[$name] = $callable;
+	/**
+	 * @param string   $name
+	 * @param callable $callable
+	 * @return $this
+	 */
+	protected final function addRule($name, callable $callable)
+	{
+		$this->rules[$name] = $callable;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * @return \SimpleXMLElement
-     */
-    protected final function getMeta()
-    {
-        return $this->meta;
-    }
+	/**
+	 * @return \SimpleXMLElement
+	 */
+	protected final function getMeta()
+	{
+		return $this->meta;
+	}
 
-    /**
-     * Init rules and aliases
-     */
-    protected function init()
-    {
+	/**
+	 * Init rules and aliases
+	 */
+	protected function init()
+	{
 
-    }
+	}
 }
