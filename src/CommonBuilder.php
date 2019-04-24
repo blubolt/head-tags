@@ -9,6 +9,9 @@ namespace blubolt\HeadTags;
  */
 class CommonBuilder extends AbstractBuilder
 {
+	/** @var bool Whether robots are set to noindex */
+	private $noindex = false;
+
 	/**
 	 * @inheritdoc
 	 */
@@ -17,8 +20,8 @@ class CommonBuilder extends AbstractBuilder
 		$this
 			->addRule('title', [$this, 'ruleTitle'], true)
 			->addRule('description', [$this, 'ruleCommon'], true)
-			->addRule('robots', [$this, 'ruleCommon'], true)
-			->addRule('canonical', [$this, 'ruleLink'], true)
+			->addRule('robots', [$this, 'ruleRobots'], true)
+			->addRule('canonical', [$this, 'ruleCanonical'], true)
 			->addRule('prev', [$this, 'ruleLink'], true)
 			->addRule('next', [$this, 'ruleLink'], true)
 			->addRule('alternate', [$this, 'ruleLink'])
@@ -47,6 +50,14 @@ class CommonBuilder extends AbstractBuilder
 		$el->setAttribute('content', $content);
 	}
 
+	protected function ruleRobots(string $directives, string $name): void
+	{
+		$directives = strtolower($directives);
+		$this->noindex = (strpos($directives, 'noindex') !== false);
+
+		$this->ruleCommon($directives, $name);
+	}
+
 	protected function ruleCharset(string $charset): void
 	{
 		$el = $this->createElement('meta');
@@ -60,6 +71,16 @@ class CommonBuilder extends AbstractBuilder
 
 		$el->setAttribute('http-equiv', $httpEquiv);
 		$el->setAttribute('content', $content);
+	}
+
+	protected function ruleCanonical(string $href, string $rel): void
+	{
+		if ($this->noindex) {
+			// Non-indexed pages do not need a canonical
+			return;
+		}
+
+		$this->ruleLink($href, $rel);
 	}
 
 	/**

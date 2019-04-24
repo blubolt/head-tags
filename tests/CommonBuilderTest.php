@@ -13,8 +13,7 @@ use Generator;
  */
 class CommonBuilderTest extends TestCase
 {
-	/** @var BuilderInterface */
-	protected $builder;
+	use TestsBuild;
 
 	public function setUp(): void
 	{
@@ -26,29 +25,23 @@ class CommonBuilderTest extends TestCase
 		unset($this->builder);
 	}
 
-	/**
-	 * @dataProvider dataBuildSet
-	 * @param mixed[] $set
-	 * @param string  $result
-	 */
-	public function testBuild(array $set, string $result): void
-	{
-		foreach ($set as $args) {
-			call_user_func_array([$this->builder, 'add'], $args);
-		}
-
-		$this->assertHtmlStringEqualsHtmlFile($result, '<head>' . $this->builder->build() . '</head>');
-	}
-
 	public function dataBuildSet(): Generator
 	{
 		yield [[], __DIR__ . '/assets/EmptyBuilder0.html'];
 
 		yield [
 			[
-				['title', 'stub title'],
+				['add', 'title', 'stub title'],
 			],
 			__DIR__ . '/assets/CommonBuilder1.html',
+		];
+
+		yield [
+			[
+				['addIfNotExists', 'title', 'expected'],
+				['addIfNotExists', 'title', 'discard'],
+			],
+			__DIR__ . '/assets/CommonBuilder2.html',
 		];
 	}
 }

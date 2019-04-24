@@ -13,8 +13,7 @@ use Generator;
  */
 class ResourceBuilderTest extends TestCase
 {
-	/** @var BuilderInterface */
-	protected $builder;
+	use TestsBuild;
 
 	public function setUp(): void
 	{
@@ -26,32 +25,18 @@ class ResourceBuilderTest extends TestCase
 		unset($this->builder);
 	}
 
-	/**
-	 * @dataProvider dataBuildSet
-	 * @param mixed[] $set
-	 * @param string  $result
-	 */
-	public function testBuild(array $set, string $result): void
-	{
-		foreach ($set as $args) {
-			call_user_func_array([$this->builder, 'add'], $args);
-		}
-
-		$this->assertHtmlStringEqualsHtmlFile($result, '<head>' . $this->builder->build() . '</head>');
-	}
-
 	public function dataBuildSet(): Generator
 	{
 		yield [[], __DIR__ . '/assets/EmptyBuilder0.html'];
 
 		yield [
 			[
-				['dns-prefetch', 'stub dns-prefetch'],
-				['preconnect', 'stub preconnect'],
-				['prefetch', 'stub prefetch'],
-				['stylesheet', 'stub stylesheet'],
-				['script', 'stub script'],
-				['script', 'stub script', ['async' => null, 'defer' => null]],
+				['add', 'dns-prefetch', 'stub dns-prefetch'],
+				['add', 'preconnect', 'stub preconnect'],
+				['add', 'prefetch', 'stub prefetch'],
+				['add', 'stylesheet', 'stub stylesheet'],
+				['add', 'script', 'stub script'],
+				['add', 'script', 'stub script', ['async' => null, 'defer' => null]],
 			],
 			__DIR__ . '/assets/ResourceBuilder1.html',
 		];

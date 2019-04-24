@@ -17,11 +17,11 @@ class TwitterBuilder extends AbstractBuilder
 	protected function init(): void
 	{
 		$this
+			->addRule('twitter:card', [$this, 'ruleCommon'], true)
 			->addRule('twitter:title', [$this, 'ruleCommon'], true)
 			->addAlias('title', 'twitter:title')
 			->addRule('twitter:description', [$this, 'ruleCommon'], true)
 			->addAlias('description', 'twitter:description')
-			->addRule('twitter:card', [$this, 'ruleCommon'], true)
 			->addRule('twitter:site', [$this, 'ruleCommon'], true)
 			->addRule('twitter:site:id', [$this, 'ruleCommon'], true)
 			->addRule('twitter:creator', [$this, 'ruleCommon'], true)

@@ -35,6 +35,18 @@ class BuilderDelegate implements BuilderInterface
 	/**
 	 * @inheritdoc
 	 */
+	public function addIfNotExists(string $name, string $value, array $attributes = []): BuilderInterface
+	{
+		foreach ($this->builders as $builder) {
+			$builder->addIfNotExists($name, $value, $attributes);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function build(): string
 	{
 		$build = '';

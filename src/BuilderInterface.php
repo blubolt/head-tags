@@ -20,6 +20,16 @@ interface BuilderInterface
 	public function add(string $name, string $value, array $attributes = []): BuilderInterface;
 
 	/**
+	 * Add property to builder if it is not already present
+	 *
+	 * @param string   $name
+	 * @param string   $value
+	 * @param string[] $attributes
+	 * @return static
+	 */
+	public function addIfNotExists(string $name, string $value, array $attributes = []): BuilderInterface;
+
+	/**
 	 * Build content which based on properties
 	 *
 	 * @return string

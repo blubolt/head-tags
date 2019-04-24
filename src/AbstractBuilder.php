@@ -63,9 +63,26 @@ abstract class AbstractBuilder implements BuilderInterface
 	/**
 	 * @inheritdoc
 	 */
+	final public function addIfNotExists(string $name, string $value, array $attributes = []): BuilderInterface
+	{
+		if (array_key_exists($name, $this->aliases)) {
+			$name = $this->aliases[$name];
+		}
+
+		if (array_key_exists($name, $this->values)) {
+			return $this;
+		}
+
+		return $this->add($name, $value, $attributes);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	final public function build(): string
 	{
-		foreach ($this->values as $name => $entries) {
+		foreach ($this->rules as $name => $rule) {
+			$entries = $this->values[$name] ?? [];
 			foreach ($entries as [$value, $attributes]) {
 				[$callable] = $this->rules[$name];
 				call_user_func($callable, $value, $name, $attributes);

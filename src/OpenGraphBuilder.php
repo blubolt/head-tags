@@ -17,11 +17,11 @@ class OpenGraphBuilder extends AbstractBuilder
 	protected function init(): void
 	{
 		$this
+			->addRule('og:type', [$this, 'ruleCommon'], true)
 			->addRule('og:title', [$this, 'ruleCommon'], true)
 			->addAlias('title', 'og:title')
 			->addRule('og:description', [$this, 'ruleCommon'], true)
 			->addAlias('description', 'og:description')
-			->addRule('og:type', [$this, 'ruleCommon'], true)
 			->addRule('og:url', [$this, 'ruleCommon'], true)
 			->addAlias('canonical', 'og:url')
 			->addRule('og:determiner', [$this, 'ruleCommon'], true)
