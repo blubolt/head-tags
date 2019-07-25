@@ -39,7 +39,8 @@ class CommonBuilder extends AbstractBuilder
 
 	protected function ruleTitle(string $value): void
 	{
-		$this->createElement('title', $value);
+		$el = $this->createElement('title');
+		$el->textContent = $value;
 	}
 
 	protected function ruleCommon(string $content, string $name): void

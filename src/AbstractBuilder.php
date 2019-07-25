@@ -121,12 +121,11 @@ abstract class AbstractBuilder implements BuilderInterface
 	 * Create an element in the built document
 	 *
 	 * @param string      $name
-	 * @param string|null $value
 	 * @return DOMElement
 	 */
-	final protected function createElement(string $name, ?string $value = null): DOMElement
+	final protected function createElement(string $name): DOMElement
 	{
-		$el = $this->document->createElement($name, $value ?: '');
+		$el = $this->document->createElement($name);
 		$this->document->appendChild($el);
 
 		return $el;
