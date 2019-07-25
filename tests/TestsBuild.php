@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace blubolt\HeadTags\Tests;
 
 use blubolt\HeadTags\BuilderInterface;
+use Exception;
 
 /**
  * TestsBuild Trait
@@ -23,7 +24,13 @@ trait TestsBuild
 	{
 		foreach ($set as $args) {
 			$func = array_shift($args);
-			call_user_func_array([$this->builder, $func], $args);
+			$callable = [$this->builder, $func];
+
+			if (!is_callable($callable)) {
+				throw new Exception('Builder not callable');
+			}
+
+			call_user_func_array($callable, $args);
 		}
 
 		$this->assertHtmlStringEqualsHtmlFile($result, '<head>' . $this->builder->build() . '</head>');

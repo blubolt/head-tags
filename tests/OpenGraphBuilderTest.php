@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace blubolt\HeadTags\Tests;
 
-use blubolt\HeadTags\BuilderInterface;
 use blubolt\HeadTags\OpenGraphBuilder;
 use Generator;
 

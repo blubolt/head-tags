@@ -81,8 +81,10 @@ abstract class AbstractBuilder implements BuilderInterface
 	 */
 	final public function build(): string
 	{
+		// phpcs:ignore SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable
 		foreach ($this->rules as $name => $rule) {
 			$entries = $this->values[$name] ?? [];
+
 			foreach ($entries as [$value, $attributes]) {
 				[$callable] = $this->rules[$name];
 				call_user_func($callable, $value, $name, $attributes);
@@ -120,7 +122,7 @@ abstract class AbstractBuilder implements BuilderInterface
 	/**
 	 * Create an element in the built document
 	 *
-	 * @param string      $name
+	 * @param string $name
 	 * @return DOMElement
 	 */
 	final protected function createElement(string $name): DOMElement

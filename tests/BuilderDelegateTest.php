@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace blubolt\HeadTags\Tests;
 
 use blubolt\HeadTags\BuilderDelegate;
-use blubolt\HeadTags\BuilderInterface;
 use blubolt\HeadTags\CommonBuilder;
 use blubolt\HeadTags\OpenGraphBuilder;
 use blubolt\HeadTags\TwitterBuilder;
