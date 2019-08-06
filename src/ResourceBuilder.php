@@ -35,7 +35,7 @@ class ResourceBuilder extends AbstractBuilder
 		$el->setAttribute('href', $href);
 
 		foreach ($attributes as $name => $value) {
-			$el->appendChild($this->createAttribute($name, $value));
+			$this->setMinimizeableAttribute($el, $name, $value);
 		}
 	}
 
@@ -52,7 +52,7 @@ class ResourceBuilder extends AbstractBuilder
 		$el->setAttribute('src', $src);
 
 		foreach ($attributes as $name => $value) {
-			$el->appendChild($this->createAttribute($name, $value));
+			$this->setMinimizeableAttribute($el, $name, $value);
 		}
 	}
 }

@@ -134,19 +134,22 @@ abstract class AbstractBuilder implements BuilderInterface
 	}
 
 	/**
-	 * Create an attribute ready to add to an element
+	 * Set a minimizeable attribute on an element
+	 * ie. <script src="xyz" async> rather than <script src="xyz" async="async">
 	 *
+	 * @param DOMElement  $el
 	 * @param string      $name
 	 * @param string|null $value
 	 * @return DOMAttr
 	 */
-	final protected function createAttribute(string $name, ?string $value = null): DOMAttr
+	final protected function setMinimizeableAttribute(DOMElement $el, string $name, ?string $value = null): DOMAttr
 	{
-		$attr = $this->document->createAttribute($name);
-
-		// Allow minimization of attribute if value not set
-		if ($value) {
-			$attr->value = $value;
+		if ($value === null) {
+			// Minimize attribute if value not set
+			$attr = $this->document->createAttribute($name);
+			$el->appendChild($attr);
+		} else {
+			$attr = $el->setAttribute($name, $value);
 		}
 
 		return $attr;

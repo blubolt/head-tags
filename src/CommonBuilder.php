@@ -97,7 +97,7 @@ class CommonBuilder extends AbstractBuilder
 		$el->setAttribute('href', $href);
 
 		foreach ($attributes as $name => $value) {
-			$el->appendChild($this->createAttribute($name, $value));
+			$this->setMinimizeableAttribute($el, $name, $value);
 		}
 	}
 
